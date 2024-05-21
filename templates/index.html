@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with GEMINIAI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        #chat-container {
+            max-width: 800px; /* Increased max-width */
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+            height: 500px; /* Increased height */
+            border: 2px solid #ccc;
+        }
+
+        #chat-box {
+            padding: 10px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .user-message {
+            background-color: #007bff;
+            color: #fff;
+            max-width: 70%;
+            border-top-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            padding: 10px 15px;
+            margin-right: 10px;
+        }
+
+        .ai-message {
+            background-color: #f2f2f2;
+            color: #333;
+            max-width: 70%;
+            border-top-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+            padding: 10px 15px;
+            margin-left: 10px;
+        }
+
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        input[type="text"] {
+            padding: 8px; /* Decreased padding */
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            width: 60%; /* Decreased width */
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #44ff00;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat with GeminiAI</h1>
+    <div id="chat-container">
+        <div id="chat-box"></div>
+    </div>
+    <form id="message-form">
+        <input type="text" id="user-input" name="user_input" placeholder="Type your message...">
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        document.getElementById("message-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+            var user_input = document.getElementById("user-input").value;
+            sendMessage(user_input);
+            document.getElementById("user-input").value = ""; // Clear input field after sending message
+        });
+
+        function sendMessage(user_input) {
+            fetch("/send_message", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "user_input=" + encodeURIComponent(user_input)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Handle the response data
+                document.getElementById("chat-box").innerHTML += `<div class="message">
+                                                                    <p class="user-message">${user_input}</p>
+                                                                    <p class="ai-message">${data.message}</p>
+                                                                </div>`;
+                // Scroll to bottom of chat box after new message is added
+                document.getElementById("chat-container").scrollTop = document.getElementById("chat-container").scrollHeight;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        }
+    </script>
+</body>
+</html>
